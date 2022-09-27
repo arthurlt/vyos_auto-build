@@ -39,4 +39,4 @@ jobs:
       - name: Build ISO
         run: sudo make iso
       - name: Upload to WebDAV
-        run: curl --basic --user '${{ env.WEBDAV_USER }}:${{ env.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://myfiles.fastmail.com/public/builds/vyos-${{ env.BUILD_VERSION }}-amd64.iso'
+        run: curl --silent --show-error --fail --basic --user '${{ env.WEBDAV_USER }}:${{ env.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://myfiles.fastmail.com/public/builds/vyos-${{ env.BUILD_VERSION }}-amd64.iso'
