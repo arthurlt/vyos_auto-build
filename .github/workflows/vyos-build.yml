@@ -15,10 +15,14 @@ jobs:
     steps:
       - name: change directory to /vyos
         run: cd /vyos
+      - name: getting current directory
+        run: pwd
       - name: Clone VyOS Build repo
         run: git clone -b 1.3.2 --single-branch https://github.com/vyos/vyos-build
       - name: change directory to ./vyos-build
         run: cd ./vyos-build
+      - name: getting current directory
+        run: pwd
       - name: configure build
         run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly"
       - name: make iso
