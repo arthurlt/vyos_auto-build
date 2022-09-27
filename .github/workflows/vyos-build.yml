@@ -22,7 +22,7 @@ jobs:
           echo "No build version supplied by webhook!"
           exit 1
       - name: Check for secrets
-        if: secrets.WEBDAV_USER == '' || secrets.WEBDAV_PASS == ''
+        if: ${{ secrets.WEBDAV_USER == '' || secrets.WEBDAV_PASS == '' }}
         run: |
           echo "No secrets present!
           exit 1
