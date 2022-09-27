@@ -8,6 +8,8 @@ on:
   
 env:
   BUILD_VERSION: ${{ github.event.client_payload.version }}
+  WEBDAV_USER: ${{ secrets.WEBDAV_USER }}
+  WEBDAV_PASS: ${{ secrets.WEBDAV_PASS }}
   
 jobs:
   vyos-build:
@@ -22,7 +24,7 @@ jobs:
           echo "No build version supplied by webhook!"
           exit 1
       - name: Check for secrets
-        if: ${{ secrets.WEBDAV_USER == '' || secrets.WEBDAV_PASS == '' }}
+        if: ${{ env.WEBDAV_USER == '' || env.WEBDAV_PASS == '' }}
         run: |
           echo "No secrets present!
           exit 1
@@ -33,5 +35,5 @@ jobs:
       - name: make iso
         run: sudo make iso
       - name: Upload to hosted.tuckerfami.ly
-        run: curl --basic --user '${{ secrets.WEBDAV_USER }}:${{ secrets.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://hosted.tuckerfami.ly/public/builds/'
+        run: curl --basic --user '${{ env.WEBDAV_USER }}:${{ env.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://hosted.tuckerfami.ly/public/builds/'
     
