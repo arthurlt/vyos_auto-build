@@ -4,6 +4,9 @@ on:
   push:
   workflow_dispatch:
   
+env:
+  BUILD_VERSION: 1.3.2
+  
 jobs:
   vyos-build:
     runs-on: ubuntu-latest
@@ -11,18 +14,14 @@ jobs:
       image: vyos/vyos-build:equuleus
       volumes:
         - vyos:/vyos
-      options: --privileged
-#        - --sysctl net.ipv6.conf.lo.disable_ipv6=0
-    defaults:
-        run:
-           working-directory: /vyos
+      options: --workdir /vyos --privileged
     steps:
-      - name: getting current directory
+      - name: current directory
         run: pwd
       - name: Clone VyOS Build repo
         run: git clone -b 1.3.2 --single-branch https://github.com/vyos/vyos-build .
       - name: configure build
-        run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly"
+        run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly" --build-type release --version {{ env.BUILD_VERSION }}
       - name: make iso
         run: sudo make iso
       - name: list build dir
