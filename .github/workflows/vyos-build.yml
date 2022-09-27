@@ -1,14 +1,13 @@
 name: VyOS Build
 
 on:
-  workflow_dispatch:
   repository_dispatch:
     types:
       - ifttt
       - curl
   
 env:
-  BUILD_VERSION: ${{ github.event.client_payload.version || "1.3.2" }}
+  BUILD_VERSION: ${{ github.event.client_payload.version }}
   
 jobs:
   vyos-build:
@@ -17,6 +16,11 @@ jobs:
       image: vyos/vyos-build:equuleus
       options: --privileged
     steps:
+      - name: Checking for build version
+        if: ${{ env.BUILD_VERSION != '' }}
+        run: |
+          echo "No build version supplied by webhook!"
+          exit 1
       - name: Clone VyOS Build repo
         run: git clone -b ${{ env.BUILD_VERSION }} --single-branch https://github.com/vyos/vyos-build .
       - name: configure build
