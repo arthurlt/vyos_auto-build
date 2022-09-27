@@ -17,9 +17,14 @@ jobs:
       options: --privileged
     steps:
       - name: Checking for build version
-        if: ${{ env.BUILD_VERSION == '' }}
+        if: env.BUILD_VERSION == ''
         run: |
           echo "No build version supplied by webhook!"
+          exit 1
+      - name: Check for secrets
+        if: secrets.WEBDAV_USER == '' || secrets.WEBDAV_PASS == ''
+        run: |
+          echo "No secrets present!
           exit 1
       - name: Clone VyOS Build repo
         run: git clone -b ${{ env.BUILD_VERSION }} --single-branch https://github.com/vyos/vyos-build .
@@ -27,5 +32,6 @@ jobs:
         run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly" --build-type release --version ${{ env.BUILD_VERSION }}
       - name: make iso
         run: sudo make iso
-      - run: ls -l ./build
+      - name: Upload to hosted.tuckerfami.ly
+        run: curl --basic --user '${{ secrets.WEBDAV_USER }}:${{ secrets.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://hosted.tuckerfami.ly/public/builds/'
     
