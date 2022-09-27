@@ -12,11 +12,8 @@ env:
   WEBDAV_PASS: ${{ secrets.WEBDAV_PASS }}
   
 jobs:
-  vyos-build:
+  check-vars:
     runs-on: ubuntu-latest
-    container: 
-      image: vyos/vyos-build:equuleus
-      options: --privileged
     steps:
       - name: Checking for build version
         if: env.BUILD_VERSION == ''
@@ -26,8 +23,15 @@ jobs:
       - name: Check for secrets
         if: ${{ env.WEBDAV_USER == '' || env.WEBDAV_PASS == '' }}
         run: |
-          echo "No secrets present!
+          echo "Some or all secrets missing!
           exit 1
+  vyos-build:
+    needs: check-vars
+    runs-on: ubuntu-latest
+    container: 
+      image: vyos/vyos-build:equuleus
+      options: --privileged
+    steps:
       - name: Clone VyOS Build repo
         run: git clone -b ${{ env.BUILD_VERSION }} --single-branch https://github.com/vyos/vyos-build .
       - name: configure build
