@@ -20,11 +20,13 @@ jobs:
         run: |
           echo "No build version supplied by webhook!"
           exit 1
+          
       - name: Check for secrets
         if: ${{ env.WEBDAV_USER == '' || env.WEBDAV_PASS == '' }}
         run: |
           echo "Some or all secrets missing!
           exit 1
+          
   iso-build:
     needs: check-vars
     runs-on: ubuntu-latest
@@ -34,9 +36,29 @@ jobs:
     steps:
       - name: Clone VyOS Build repo
         run: git clone -b ${{ env.BUILD_VERSION }} --single-branch https://github.com/vyos/vyos-build .
+        
       - name: configure build
         run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly" --build-type release --version ${{ env.BUILD_VERSION }}
+        
       - name: Build ISO
         run: sudo make iso
+        
+      - name: Save ISO to artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: vyos_iso
+          path: ./build/vyos-${{ env.BUILD_VERSION }}-amd64.iso
+          if-no-files-found: error
+    
+  iso-upload:
+    needs: iso-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download ISO from artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: vyos_iso
+          path: /tmp/vyos-${{ env.BUILD_VERSION }}-amd64.iso
+        
       - name: Upload to WebDAV
-        run: curl --silent --show-error --fail --basic --user '${{ env.WEBDAV_USER }}:${{ env.WEBDAV_PASS }}' -T './build/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://myfiles.fastmail.com/File%20Share/public/builds/vyos-${{ env.BUILD_VERSION }}-amd64.iso'
+        run: curl --silent --show-error --fail --basic --user '${{ env.WEBDAV_USER }}:${{ env.WEBDAV_PASS }}' -T '/tmp/vyos-${{ env.BUILD_VERSION }}-amd64.iso' 'https://myfiles.fastmail.com/File%20Share/public/builds/vyos-${{ env.BUILD_VERSION }}-amd64.iso'
