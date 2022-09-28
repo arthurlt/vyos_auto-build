@@ -38,7 +38,7 @@ jobs:
         run: git clone -b ${{ env.BUILD_VERSION }} --single-branch https://github.com/vyos/vyos-build .
         
       - name: configure build
-        run: ./configure --architecture amd64 --build-by "arthur@tuckerfami.ly" --build-type release --version ${{ env.BUILD_VERSION }}
+        run: ./configure --architecture amd64 --build-by "${{ env.WEBDAV_USER }}" --build-type release --version ${{ env.BUILD_VERSION }}
         
       - name: Build ISO
         run: sudo make iso
