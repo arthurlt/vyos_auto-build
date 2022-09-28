@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "Some or all secrets missing!
           exit 1
-  vyos-build:
+  iso-build:
     needs: check-vars
     runs-on: ubuntu-latest
     container: 
